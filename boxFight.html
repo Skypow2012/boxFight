@@ -1,0 +1,141 @@
+﻿<html>
+<head>
+  <style type="text/css">
+    #messages { padding: 0px; list-style-type: none;}
+    #messages li { padding: 2px 0px; border-bottom: 1px solid #ccc; }
+  </style>
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+    <style>
+        .box {position:absolute;height:100px;width:100px;}
+        .jifenbang {float:left}
+        .jifenbang {float:left}
+        #player1 {background:#01814A;left:100px;top:100px}
+        #player2 {background:#003D79;left:200px;top:200px}
+    </style>
+  <script>
+      
+    var socket = io.connect();
+      $(function() {
+          socket.on('connect', function() {
+              socket.on('message', function(message) {
+                  if (message.indexOf('player') > -1) {
+                    var player = document.getElementById(message.split(' : ')[0]);
+                        player.style.left = message.split(' : ')[1].split(' ')[0];
+                        player.style.top = message.split(' : ')[1].split(' ')[1];
+                  } else {
+                    $('#messages').append($('<li></li>').text(message));
+                  }
+              });
+              socket.on('disconnect', function() {
+                  $('#messages').append('<li>Disconnected</li>');
+              });
+          });
+
+          var el = $('#chatmsg');
+          
+          $('#chatmsg').keypress(function(e) {
+              if (e.which == 13) {
+                  e.preventDefault();
+                  socket.send(el.val());
+                  $('#messages').append($('<li></li>').text(el.val()));
+                  el.val('');
+              }
+          });
+      });
+  </script>
+</head>
+<body>
+ <ul id="messages"></ul>
+ <hr>
+ <input type="text" id="chatmsg">
+    <div class="box" id="player1"></div>
+    <div class="box" id="player2"></div>
+    <div class="jifenbang">
+        player1<input id="score1" value=0></input>
+        <br><br>
+        player2<input id="score2" value=0></input>
+    </div>
+    <script type="text/javascript">
+        function restart() {
+            player1.style.top = 100;
+            player1.style.left = 100;
+            player1.style.width = 100;
+            player1.style.height = 100;
+            player2.style.top = 100;
+            player2.style.left = 300;
+            player2.style.width = 100;
+            player2.style.height = 100;
+        }
+        var key_ = {'w':119,'d':100,'s':115,'a':97,'q':113,'i':105,'l':108,'k':107,'j':106,'o':111};
+        restart();
+        window.onload = function() {
+            var player1 = document.getElementById("player1");
+            var player2 = document.getElementById("player2");
+            var score1 = document.getElementById("score1");
+            var score2 = document.getElementById("score2");
+            document.addEventListener('keypress',key_down,false);
+            function key_down(e) {
+                // alert(e.keyCode);
+                // alert(e.ctrlKey);
+                if (e.which == 119 || e.which == 100 || e.which == 115 || e.which == 97 || e.which == 113) {
+
+                    if (e.which == 119) {
+                        player1.style.top = parseInt(player1.style.top) - 10;
+                    } else if (e.which == 100) {
+                        player1.style.left = parseInt(player1.style.left) + 10;
+                    } else if (e.which == 115) {
+                        player1.style.top = parseInt(player1.style.top) + 10;
+                    } else if (e.which == 97) {
+                        player1.style.left = parseInt(player1.style.left) - 10;
+                    } else if (e.which == 113) {
+                        var x1 = parseInt(player1.style.left);
+                        var y1 = parseInt(player1.style.top);
+                        var x2 = parseInt(player2.style.left);
+                        var y2 = parseInt(player2.style.top);
+                        // alert(x1 + ' ' + x2 + ' ' + y1 + ' ' + y2);
+                        if ( (x1-x2)*(x1-x2) < 10000 && (y1-y2)*(y1-y2) < 10000 ) {
+                            score1.value = parseInt(score1.value) + 1;
+                            player1.style.width = parseInt(player1.style.width) +10;
+                            player1.style.height = parseInt(player1.style.height) +10;
+                            if (parseInt(player1.style.width) > 300) {
+                                alert('player1 win');
+                            }
+                        }
+                    }
+                    socket.send('player1 : ' + parseInt(player1.style.left) + ' ' + parseInt(player1.style.top));
+                } else if (e.which == 105 || e.which == 108 || e.which == 107 || e.which == 106 || e.which == 111) {
+                    if (e.which == 105) {
+                        player2.style.top = parseInt(player2.style.top) - 10;
+                    } else if (e.which == 108) {
+                        player2.style.left = parseInt(player2.style.left) + 10;
+                    } else if (e.which == 107) {
+                        player2.style.top = parseInt(player2.style.top) + 10;
+                    } else if (e.which == 106) {
+                        player2.style.left = parseInt(player2.style.left) - 10;
+                    } else if (e.which == 111) {
+                        var x1 = parseInt(player1.style.left);
+                        var y1 = parseInt(player1.style.top);
+                        var x2 = parseInt(player2.style.left);
+                        var y2 = parseInt(player2.style.top);
+                        // alert(x1 + ' ' + x2 + ' ' + y1 + ' ' + y2);
+                        if ( (x1-x2)*(x1-x2) < 10000 && (y1-y2)*(y1-y2) < 10000 ) {
+                            score2.value = parseInt(score2.value) + 1;
+                            player2.style.width = parseInt(player2.style.width) +10;
+                            player2.style.height = parseInt(player2.style.height) +10;
+                            if (parseInt(player2.style.width) > 300) {
+                                alert('player2 win');
+                            }
+                        }
+                    }
+                    socket.send('player2 : ' + parseInt(player2.style.left) + ' ' + parseInt(player2.style.top));
+                } else {
+                    if (e.which == 13) {
+                        restart();
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
