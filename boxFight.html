@@ -7,9 +7,10 @@
     #messages li { padding: 2px 0px; border-bottom: 1px solid #ccc; }
   </style>
   <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://ko-orz.com/js/vconsole.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
     <style>
-        .box {position:absolute;height:100px;width:100px;}
+        .box {position:fixed;height:100px;width:100px;}
         .jifenbang {float:left}
         .jifenbang {float:left}
         #player1 {background:#01814A;left:100px;top:100px}
@@ -77,6 +78,15 @@
             var score1 = document.getElementById("score1");
             var score2 = document.getElementById("score2");
             document.addEventListener('keypress',key_down,false);
+            document.addEventListener('touchstart',touch_screen,false);
+            document.addEventListener('touchmove',touch_screen,false);
+            function touch_screen(e) {
+                var x = e.pageX;
+                var y = e.pageY;
+                player1.style.left = x;
+                player1.style.top = y;
+                socket.send('player1 : ' + x + ' ' + y);
+            }
             function key_down(e) {
                 // alert(e.keyCode);
                 // alert(e.ctrlKey);
